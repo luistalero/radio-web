@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow"><title>Estudio · Frecuencia Abierta</title>
+    <link rel="stylesheet" href="./admin.css">
+  </head>
+  <body>
+    <main class="admin-shell">
+      <div class="signal-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <a class="brand" href="../index.html"><span>〰</span><strong>Frecuencia<br><i>Abierta</i></strong></a>
+      <section class="login-card" id="login-view" aria-labelledby="login-title">
+        <div class="login-emblem" aria-hidden="true"><span></span><span></span><span></span><b>〰</b></div>
+        <span class="eyebrow">ESTUDIO PRIVADO</span><h1 id="login-title">La señal<br><em>es tuya.</em></h1>
+        <p>Ingresa para actualizar las voces y contenidos de Frecuencia Abierta.</p>
+        <form id="login-form"><label>Usuario<input name="username" autocomplete="username" required></label><label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label><button type="submit">Entrar al estudio <span>↗</span></button><p class="status" id="login-status" role="status"></p></form>
+      </section>
+      <section class="editor-card" id="editor-view" hidden aria-labelledby="editor-title">
+        <div class="editor-top"><div><span class="eyebrow">SESIÓN PROTEGIDA</span><h1 id="editor-title">Editar contenido</h1></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
+        <p>Modifica el contenido en formato JSON. Guarda para actualizar la página pública.</p>
+        <label class="editor-label" for="content-editor">Contenido editorial</label><textarea id="content-editor" spellcheck="false" aria-label="Contenido editorial en formato JSON"></textarea>
+        <div class="editor-actions"><button id="save" type="button">Guardar cambios <span>↗</span></button><p class="status" id="editor-status" role="status"></p></div>
+      </section>
+    </main>
+    <script src="../js/config.js"></script><script src="./admin.js"></script>
+  </body>
+</html>

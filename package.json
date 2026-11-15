@@ -1,0 +1,7 @@
+{
+  "name": "frecuencia-abierta",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "dependencies": { "@vercel/blob": "^2.6.1" }
+}

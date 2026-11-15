@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#002A50">
+    <meta name="description" content="Radio comunitaria desde San Juan Nepomuceno, Bolívar. Cultura, historias, música y actualidad de nuestra tierra y del mundo.">
+    <meta property="og:title" content="Frecuencia Abierta — La voz de nuestra gente">
+    <meta property="og:description" content="Un punto de encuentro entre la cultura, la música y las historias que nos hacen comunidad.">
+    <meta property="og:locale" content="es_CO">
+    <meta property="og:type" content="website">
+    <title>Frecuencia Abierta — La voz de nuestra gente</title>
+    <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./assets/icons/apple-icon.png">
+    <link rel="preload" as="image" href="./assets/images/montes-maria-editorial.png" fetchpriority="high">
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/animations.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="Frecuencia Abierta, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 6v12M22 10v4" /></svg>
+        </span>
+        <span class="brand-wordmark"><strong>Frecuencia</strong><span>Abierta</span></span>
+      </a>
+      <button class="mobile-menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
+        <span class="menu-glyph" aria-hidden="true"><i></i><i></i></span>
+      </button>
+      <nav id="primary-navigation" class="primary-navigation" aria-label="Navegación principal">
+        <a href="#live">En vivo</a>
+        <a href="#programs">Programas</a>
+        <a href="#territory">Nuestra tierra</a>
+        <a href="#stories">Historias</a>
+        <a href="#scripts">Guiones</a>
+        <a class="nav-listen" href="#live">Escuchar <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main id="main-content" class="radio-experience">
+      <section id="home" class="hero-section" aria-labelledby="hero-title">
+        <div class="hero-parallax" aria-hidden="true">
+          <img class="hero-image" src="./assets/images/montes-maria-editorial.png" alt="" fetchpriority="high">
+        </div>
+        <div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <div class="eyebrow hero-eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span><span id="hero-location">San Juan Nepomuceno · Bolívar</span></div>
+          <h1 id="hero-title"><span id="hero-title-text">La voz de nuestra gente,</span><span id="hero-subtitle">las historias de nuestro mundo.</span></h1>
+          <p class="hero-description" id="hero-description">Un punto de encuentro entre la cultura, la música y las historias que nos hacen comunidad.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#live"><span class="button-signal" aria-hidden="true">〰</span>Escuchar en vivo <span aria-hidden="true">↗</span></a>
+            <a class="button button-glass" href="#programs">Explorar programas</a>
+          </div>
+        </div>
+        <div class="hero-orb" id="hero-orb" aria-hidden="true">
+          <div class="orb-fallback"><span></span><span></span><span></span></div>
+        </div>
+        <a class="scroll-cue" href="#live"><span>Una señal abierta para todos</span><span class="scroll-arrow" aria-hidden="true">↓</span></a>
+        <div class="hero-index" aria-hidden="true"><span>01</span><i></i>07</div>
+      </section>
+
+      <section id="live" class="section live-section" aria-labelledby="live-title">
+        <div class="section-orbit live-orbit" aria-hidden="true"></div>
+        <div class="section-container live-layout">
+          <div class="live-intro reveal">
+            <div class="section-kicker"><span>01 / LA SEÑAL</span><span class="kicker-line" aria-hidden="true"></span></div>
+            <h2 id="live-title">Un mismo pulso.<br><em>Muchas voces.</em></h2>
+            <p>La radio sucede aquí: un espacio abierto para las voces de nuestro territorio y la música que nos conecta.</p>
+            <div class="live-meta"><span class="status-dot" aria-hidden="true"></span><span id="signal-state">SEÑAL TODAVÍA NO DISPONIBLE</span></div>
+          </div>
+
+          <div class="live-player-wrap reveal">
+            <div class="live-player">
+              <div class="player-topline">
+                <div class="live-badge"><span class="live-indicator" aria-hidden="true"></span><span id="player-badge">SEÑAL PENDIENTE</span></div>
+                <span class="player-frequency">FA — 01</span>
+              </div>
+              <div class="waveform" id="waveform" aria-hidden="true"></div>
+              <div class="track-row">
+                <div class="track-icon" aria-hidden="true"><span>FA</span></div>
+                <div class="track-copy"><span class="track-label">PROGRAMACIÓN</span><strong>Programa por anunciar</strong><span>Frecuencia Abierta · San Juan Nepomuceno</span></div>
+                <span class="track-pending">Horario pendiente</span>
+              </div>
+              <div class="player-controls">
+                <button class="play-button" id="play-toggle" type="button" aria-label="Intentar escuchar la transmisión en vivo">
+                  <span class="play-glyph" aria-hidden="true">▶</span>
+                </button>
+                <div class="player-action-copy"><strong id="play-label">Escucha la señal</strong><span id="connection-label">Conexión de audio pendiente</span></div>
+                <label class="volume-control" for="radio-volume"><span>Volumen</span><input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.8"><output id="volume-output" for="radio-volume">80%</output></label>
+              </div>
+              <audio id="radio-audio" preload="none"></audio>
+              <p class="player-status" id="player-status" role="status" aria-live="polite" hidden></p>
+            </div>
+            <div class="listener-note"><span aria-hidden="true">◉</span><span>La experiencia comienza con una señal compartida.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="programs" class="section programs-section" aria-labelledby="programs-title">
+        <div class="section-container">
+          <div class="programs-heading reveal">
+            <div class="section-kicker"><span>02 / LAS VOCES</span><span class="kicker-line" aria-hidden="true"></span></div>
+            <div class="programs-heading-row">
+              <div><h2 id="programs-title">Siete formas de<br><em>estar cerca.</em></h2><p>Historias, música, ideas y cultura. Encuentra tu frecuencia.</p></div>
+              <div class="program-count"><span>07</span><i>programas<br>para escuchar</i></div>
+            </div>
+          </div>
+          <div class="program-list" id="program-list">
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">G</span><span class="program-art-index">01</span></div>
+              <div class="program-info"><span class="program-category">Historias humanas y crónicas de vida</span><h3>Gente de verdad</h3><p>Personas comunes, historias extraordinarias. Un espacio para escuchar a quienes construyen su camino con esfuerzo, oficio y esperanza.</p><p class="program-detail" id="program-detail-gente" hidden>Agricultores, vendedores, artesanos, trabajadores, emprendedores y adultos mayores comparten las experiencias que merecen ser contadas.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-gente"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">♫</span><span class="program-art-index">02</span></div>
+              <div class="program-info"><span class="program-category">Música y cultura musical</span><h3>Canciones con historia</h3><p>Un recorrido por las historias que viven detrás de cada melodía: sus autores, intérpretes, épocas e inspiraciones.</p><p class="program-detail" id="program-detail-canciones" hidden>Del Caribe a Colombia y al mundo, cada episodio pone en contexto canciones que han acompañado a distintas generaciones.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-canciones"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">M</span><span class="program-art-index">03</span></div>
+              <div class="program-info"><span class="program-category">Actualidad nacional e internacional</span><h3>El mundo en minutos</h3><p>Información clara y breve para entender los acontecimientos más relevantes de Colombia y el mundo.</p><p class="program-detail" id="program-detail-mundo" hidden>Noticias explicadas con contexto para abrir conversaciones sobre su impacto en la vida de las comunidades.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-mundo"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">T</span><span class="program-art-index">04</span></div>
+              <div class="program-info"><span class="program-category">Cultura, memoria y tradiciones</span><h3>Voces de nuestra tierra</h3><p>Los nombres, las costumbres, los personajes y los saberes que dan identidad a nuestros pueblos.</p><p class="program-detail" id="program-detail-tierra" hidden>Una mirada especial a San Juan Nepomuceno, los Montes de María y la región Caribe.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-tierra"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">L</span><span class="program-art-index">05</span></div>
+              <div class="program-info"><span class="program-category">Libros, películas y series</span><h3>Entre páginas y pantallas</h3><p>Recomendaciones y conversaciones para descubrir nuevas historias en la literatura y el audiovisual.</p><p class="program-detail" id="program-detail-paginas" hidden>Personajes, adaptaciones, mensajes y curiosidades de obras para ver, leer y compartir.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-paginas"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">C</span><span class="program-art-index">06</span></div>
+              <div class="program-info"><span class="program-category">Artistas, músicos y creadores</span><h3>Talento de nuestra tierra</h3><p>Un escenario para conversar con quienes crean, cantan, escriben y hacen crecer el talento local.</p><p class="program-detail" id="program-detail-talento" hidden>Conoce trayectorias, proyectos, procesos creativos y las experiencias detrás de cada propuesta.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-talento"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+            <article class="tilt-card program-row" data-program-row>
+              <div class="program-art" aria-hidden="true"><span class="program-art-orbit orbit-one"></span><span class="program-art-orbit orbit-two"></span><span class="program-art-mark">?</span><span class="program-art-index">07</span></div>
+              <div class="program-info"><span class="program-category">Misterios, ciencia y curiosidades</span><h3>Más allá de lo conocido</h3><p>Enigmas, leyendas, fenómenos científicos y preguntas sobre el universo, con curiosidad y contexto.</p><p class="program-detail" id="program-detail-conocido" hidden>Cada tema se investiga para distinguir los hechos comprobados de las hipótesis y las creencias populares.</p></div>
+              <button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-conocido"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
+            </article>
+          </div>
+          <p class="programs-note"><span class="note-mark" aria-hidden="true">*</span>La programación y los horarios se anunciarán próximamente.</p>
+        </div>
+      </section>
+
+      <section id="territory" class="section territory-section" aria-labelledby="territory-title">
+        <div class="territory-image-wrap">
+          <img class="territory-image" src="./assets/images/montes-maria-editorial.png" alt="Ilustración de los Montes de María bajo la luz azulada del amanecer." loading="lazy">
+          <div class="territory-image-shade" aria-hidden="true"></div>
+          <div class="image-caption"><span>ILUSTRACIÓN EDITORIAL</span><i aria-hidden="true"></i></div>
+          <div class="territory-image-title">Un territorio<br><em>que cuenta.</em></div>
+        </div>
+        <div class="territory-copy"><div class="reveal">
+          <div class="section-kicker"><span>03 / NUESTRA TIERRA</span><span class="kicker-line" aria-hidden="true"></span></div>
+          <h2 id="territory-title">De aquí.<br><em>Y para todos.</em></h2>
+          <p class="territory-lede">Desde San Juan Nepomuceno, abrimos una ventana sonora a los Montes de María y a las historias que nos conectan con el Caribe y con el mundo.</p>
+          <div class="territory-facts">
+            <div class="territory-fact"><span class="fact-symbol" aria-hidden="true">⌖</span><span><strong>San Juan Nepomuceno</strong><small>Bolívar · Colombia</small></span></div>
+            <div class="territory-fact"><span class="fact-symbol" aria-hidden="true">〰</span><span><strong>Montes de María</strong><small>Territorio, memoria y cultura</small></span></div>
+          </div>
+          <a class="text-link" href="#stories">Conoce nuestras historias <span aria-hidden="true">↗</span></a>
+        </div></div>
+      </section>
+
+      <section id="stories" class="section stories-section" aria-labelledby="stories-title">
+        <div class="section-container">
+          <div class="stories-heading reveal">
+            <div class="section-kicker"><span>04 / PARA DESCUBRIR</span><span class="kicker-line" aria-hidden="true"></span></div>
+            <div class="stories-heading-row"><div><h2 id="stories-title">Las historias<br><em>nos encuentran.</em></h2><p>Crónicas, memorias y preguntas que merecen un espacio al aire.</p></div><span class="stories-index">GUIONES<br>DE LA CASA</span></div>
+          </div>
+          <div class="story-grid">
+            <article class="tilt-card story-card reveal">
+              <div class="story-image"><img src="./assets/images/radio-culture-editorial.png" alt="Ilustración editorial de una radio y un micrófono junto a un paisaje montañoso." loading="lazy"><div class="story-image-shade" aria-hidden="true"></div><span class="story-number">01</span></div>
+              <div class="story-copy"><span class="story-type">CRÓNICA SONORA · GUION</span><h3>Una mañana en el mercado El Mamón</h3><p>A las tres de la mañana, Ricardo y su esposa empiezan una jornada de trabajo que lleva más de quince años. Cada frito que venden sostiene un proyecto de familia.</p><a href="#programs" class="story-link"><span>Gente de verdad</span><span aria-hidden="true">↗</span></a></div>
+            </article>
+            <article class="tilt-card story-card reveal">
+              <div class="story-image"><img src="./assets/images/montes-maria-editorial.png" alt="Ilustración panorámica de los Montes de María al amanecer." loading="lazy"><div class="story-image-shade" aria-hidden="true"></div><span class="story-number">02</span></div>
+              <div class="story-copy"><span class="story-type">MEMORIA MUSICAL · GUION</span><h3>Una canción que lleva el nombre de su tierra</h3><p>La historia de Lucho Bermúdez y la composición que convirtió a El Carmen de Bolívar en una referencia de la música colombiana.</p><a href="#programs" class="story-link"><span>Canciones con historia</span><span aria-hidden="true">↗</span></a></div>
+            </article>
+            <article class="tilt-card story-card reveal">
+              <div class="story-image"><img src="./assets/images/radio-culture-editorial.png" alt="Ilustración editorial de una radio comunitaria rodeada de formas montañosas." loading="lazy"><div class="story-image-shade" aria-hidden="true"></div><span class="story-number">03</span></div>
+              <div class="story-copy"><span class="story-type">CIENCIA E HISTORIA · GUION</span><h3>Chernóbil: una lección que cruzó fronteras</h3><p>Una historia sobre el accidente de 1986 y las lecciones que dejó sobre prevención, seguridad y transparencia.</p><a href="#programs" class="story-link"><span>Más allá de lo conocido</span><span aria-hidden="true">↗</span></a></div>
+            </article>
+          </div>
+          <p class="story-note">Fragmentos de guiones compartidos por Frecuencia Abierta; no representan emisiones publicadas.</p>
+        </div>
+      </section>
+
+      <section id="scripts" class="section scripts-section" aria-labelledby="scripts-title">
+        <div class="scripts-glow" aria-hidden="true"></div>
+        <div class="section-container">
+          <div class="scripts-heading reveal">
+            <div class="section-kicker"><span>05 / ARCHIVO SONORO</span><span class="kicker-line" aria-hidden="true"></span></div>
+            <div class="scripts-heading-row">
+              <div><h2 id="scripts-title">Cada voz tiene<br><em>su propia historia.</em></h2><p>Conoce los programas y sus guiones: una colección de relatos, cultura, actualidad y curiosidad desde nuestra región.</p></div>
+              <span class="scripts-index">07<br><small>GUIONES</small></span>
+            </div>
+          </div>
+          <div class="script-list reveal" data-script-list>
+            <details class="script-item"><summary><span class="script-number">01</span><span><strong>Gente de verdad</strong><small>Historias humanas y crónicas de vida</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Hay historias que no aparecen en los titulares, pero merecen ser contadas. En este espacio conocemos las experiencias de agricultores, vendedores, artesanos, trabajadores, emprendedores y adultos mayores.</p><p>La crónica inaugural acompaña a Ricardo, quien desde hace más de quince años prepara fritos de madrugada para venderlos en el mercado El Mamón de El Carmen de Bolívar. Detrás de cada venta hay constancia, orgullo y el sueño cumplido de apoyar a su hija hasta la universidad.</p></div></details>
+            <details class="script-item"><summary><span class="script-number">02</span><span><strong>Canciones con historia</strong><small>Música y cultura musical</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Un recorrido por las historias detrás de las melodías: compositores, intérpretes, inspiraciones, significados y épocas.</p><p>El primer programa viaja desde <em>Carmen de Bolívar</em> de Lucho Bermúdez hasta <em>Gotas de lluvia</em> del Grupo Niche y el encuentro de Carlos Vives con Marc Anthony en <em>Cuando nos volvamos a encontrar</em>.</p></div></details>
+            <details class="script-item"><summary><span class="script-number">03</span><span><strong>El mundo en minutos</strong><small>Actualidad nacional e internacional</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Noticias breves, claras y con contexto para entender sus implicaciones sociales. El guion reúne información sobre la situación de seguridad en Catatumbo, las deudas de las EPS con hospitales y la elección de Luz Stella Murgas como presidenta de la ANDI.</p></div></details>
+            <details class="script-item"><summary><span class="script-number">04</span><span><strong>Voces de nuestra tierra</strong><small>Cultura, memoria y tradiciones</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Un programa para descubrir los nombres, costumbres, personajes y saberes de nuestros pueblos. Su primer recorrido se detiene en El Carmen de Bolívar: su historia, el legado de Lucho Bermúdez y sabores como la Chepacorina, memoria dulce de la región.</p></div></details>
+            <details class="script-item"><summary><span class="script-number">05</span><span><strong>Entre páginas y pantallas</strong><small>Libros, películas y series</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Reseñas y recomendaciones para conversar sobre las historias que vemos y leemos. La selección incluye <em>El gato con sombrero</em>, <em>Pacífico</em>, <em>Godzilla Minus Zero</em> y la novela <em>La perra</em>, de Pilar Quintana.</p></div></details>
+            <details class="script-item"><summary><span class="script-number">06</span><span><strong>Talento de nuestra tierra</strong><small>Artistas, músicos y creadores</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Un escenario de entrevista para escuchar las trayectorias, proyectos, procesos creativos y sueños de quienes hacen crecer el talento de la región. La conversación abre espacio para conocer los retos, metas y redes de cada invitado.</p></div></details>
+            <details class="script-item"><summary><span class="script-number">07</span><span><strong>Más allá de lo conocido</strong><small>Misterios, ciencia y curiosidades</small></span><i aria-hidden="true">+</i></summary><div class="script-content"><p>Casos sorprendentes, leyendas, ciencia y preguntas sobre el universo, siempre distinguiendo los hechos de las hipótesis. El episodio de apertura aborda el accidente de Chernóbil de 1986, sus consecuencias humanas y las lecciones de prevención, seguridad y transparencia.</p></div></details>
+          </div>
+        </div>
+      </section>
+
+      <section id="participate" class="section participate-section" aria-labelledby="participate-title">
+        <div class="section-container participate-layout">
+          <div class="participate-intro reveal">
+            <div class="section-kicker"><span>06 / TU TURNO</span><span class="kicker-line" aria-hidden="true"></span></div>
+            <h2 id="participate-title">Tu voz también<br><em>es parte de esto.</em></h2>
+            <p>¿Tienes una historia, una idea o una propuesta? Este micrófono también es tuyo.</p>
+            <div class="participate-aside"><span>01</span><i aria-hidden="true"></i><span>COMUNIDAD ABIERTA</span></div>
+          </div>
+          <div class="participate-form-wrap reveal">
+            <form class="participate-form" id="participation-form">
+              <div class="form-row">
+                <label class="form-field"><span>Tu nombre</span><input name="name" autocomplete="name" required minlength="2" placeholder="¿Cómo te llamas?"></label>
+                <label class="form-field"><span>Correo electrónico</span><input name="email" type="email" autocomplete="email" required placeholder="nombre@correo.com"></label>
+              </div>
+              <label class="form-field"><span>Tema o propuesta</span><input name="topic" required minlength="3" placeholder="¿Qué te gustaría compartir?"></label>
+              <label class="form-field"><span>Cuéntanos un poco más</span><textarea name="message" rows="4" required minlength="12" placeholder="Escribe aquí tu historia o idea..."></textarea></label>
+              <p class="form-privacy">Por ahora, este formulario no transmite ni almacena tus datos. La recepción de propuestas estará disponible cuando se conecte un servicio de envío.</p>
+              <button class="button button-primary form-submit" type="submit">Preparar propuesta <span aria-hidden="true">↗</span></button>
+              <p class="form-status" id="form-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-container">
+        <section class="credits-panel" aria-labelledby="credits-title">
+          <div class="credits-signal" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div><span class="credits-kicker">CRÉDITOS ACADÉMICOS</span><h2 id="credits-title">Frecuencia Abierta</h2><p>Una propuesta radial creada desde las historias y voces de nuestra comunidad.</p></div>
+          <div class="credits-data"><p><strong>Por <span id="credits-author">Silvia Lunas Talero</span></strong><br><span id="credits-role">Estudiante de Comunicación Social</span></p><a id="credits-email" href="mailto:splunast@unadvirtual.edu.co">splunast@unadvirtual.edu.co</a></div>
+          <div class="credits-data"><p><span id="credits-institution">Universidad Nacional Abierta y a Distancia — UNAD</span><br><span id="credits-course">Formatos radiofónicos · José Alirio Marín</span><br><span id="credits-school">Escuela de Ciencias Sociales, Artes y Humanidades (ECSAH)</span><br><span id="credits-location-year">CEAD Cartagena · 2026</span></p></div>
+        </section>
+        <div class="footer-main">
+          <div class="footer-brand-block">
+            <a class="brand footer-brand" href="#home" aria-label="Frecuencia Abierta, volver al inicio">
+              <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 6v12M22 10v4" /></svg></span>
+              <span class="brand-wordmark"><strong>Frecuencia</strong><span>Abierta</span></span>
+            </a>
+            <p>La voz de nuestra gente,<br>las historias de nuestro mundo.</p>
+          </div>
+          <div class="footer-nav-block"><h2>Explora</h2><nav aria-label="Navegación del pie de página"><a href="#live">En vivo <span aria-hidden="true">↗</span></a><a href="#programs">Programas <span aria-hidden="true">↗</span></a><a href="#territory">Nuestra tierra <span aria-hidden="true">↗</span></a><a href="#stories">Historias <span aria-hidden="true">↗</span></a><a href="#scripts">Guiones <span aria-hidden="true">↗</span></a><a href="#participate">Participa <span aria-hidden="true">↗</span></a></nav></div>
+          <div class="footer-contact-block"><h2>En el aire desde</h2><p>San Juan Nepomuceno<br>Bolívar, Colombia</p><span class="footer-note">Redes y contacto oficial<br>próximamente.</span></div>
+          <a class="back-to-top" href="#home" aria-label="Volver arriba"><span aria-hidden="true">↑</span></a>
+        </div>
+        <div class="footer-bottom"><span>© <span id="current-year"></span> Frecuencia Abierta</span><span>Una emisora comunitaria, muchas voces.</span><a class="owner-access" href="./admin/" aria-label="Acceso privado de administración" title="Acceso privado">SL</a></div>
+      </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" crossorigin="anonymous"></script>
+    <script src="./js/config.js"></script>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

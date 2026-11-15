@@ -1,0 +1,26 @@
+{
+  "hero": {
+    "location": "San Juan Nepomuceno · Bolívar",
+    "title": "La voz de nuestra gente,",
+    "subtitle": "las historias de nuestro mundo.",
+    "description": "Un punto de encuentro entre la cultura, la música y las historias que nos hacen comunidad."
+  },
+  "programs": [
+    { "number": "01", "mark": "G", "category": "Historias humanas y crónicas de vida", "title": "Gente de verdad", "description": "Personas comunes, historias extraordinarias. Un espacio para escuchar a quienes construyen su camino con esfuerzo, oficio y esperanza.", "detail": "Agricultores, vendedores, artesanos, trabajadores, emprendedores y adultos mayores comparten las experiencias que merecen ser contadas." },
+    { "number": "02", "mark": "♫", "category": "Música y cultura musical", "title": "Canciones con historia", "description": "Un recorrido por las historias que viven detrás de cada melodía: sus autores, intérpretes, épocas e inspiraciones.", "detail": "Del Caribe a Colombia y al mundo, cada episodio pone en contexto canciones que han acompañado a distintas generaciones." },
+    { "number": "03", "mark": "M", "category": "Actualidad nacional e internacional", "title": "El mundo en minutos", "description": "Información clara y breve para entender los acontecimientos más relevantes de Colombia y el mundo.", "detail": "Noticias explicadas con contexto para abrir conversaciones sobre su impacto en la vida de las comunidades." },
+    { "number": "04", "mark": "T", "category": "Cultura, memoria y tradiciones", "title": "Voces de nuestra tierra", "description": "Los nombres, las costumbres, los personajes y los saberes que dan identidad a nuestros pueblos.", "detail": "Una mirada especial a San Juan Nepomuceno, los Montes de María y la región Caribe." },
+    { "number": "05", "mark": "L", "category": "Libros, películas y series", "title": "Entre páginas y pantallas", "description": "Recomendaciones y conversaciones para descubrir nuevas historias en la literatura y el audiovisual.", "detail": "Personajes, adaptaciones, mensajes y curiosidades de obras para ver, leer y compartir." },
+    { "number": "06", "mark": "C", "category": "Artistas, músicos y creadores", "title": "Talento de nuestra tierra", "description": "Un escenario para conversar con quienes crean, cantan, escriben y hacen crecer el talento local.", "detail": "Conoce trayectorias, proyectos, procesos creativos y las experiencias detrás de cada propuesta." },
+    { "number": "07", "mark": "?", "category": "Misterios, ciencia y curiosidades", "title": "Más allá de lo conocido", "description": "Enigmas, leyendas, fenómenos científicos y preguntas sobre el universo, con curiosidad y contexto.", "detail": "Cada tema se investiga para distinguir los hechos comprobados de las hipótesis y las creencias populares." }
+  ],
+  "credits": {
+    "author": "Silvia Lunas Talero",
+    "role": "Estudiante de Comunicación Social",
+    "email": "splunast@unadvirtual.edu.co",
+    "institution": "Universidad Nacional Abierta y a Distancia — UNAD",
+    "course": "Formatos radiofónicos · José Alirio Marín",
+    "school": "Escuela de Ciencias Sociales, Artes y Humanidades (ECSAH)",
+    "locationYear": "CEAD Cartagena · 2026"
+  }
+}

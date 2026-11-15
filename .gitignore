@@ -1,0 +1,16 @@
+# Local dependencies and generated output
+/node_modules/
+/dist/
+
+# Provider metadata
+.vercel/
+.netlify/
+
+# Logs and local environment
+*.log
+*lock.json
+.env*
+.DS_Store
+
+.vercel
+.env*
