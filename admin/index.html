@@ -17,8 +17,8 @@
       </section>
       <section class="editor-card" id="editor-view" hidden aria-labelledby="editor-title">
         <div class="editor-top"><div><span class="eyebrow">SESIÓN PROTEGIDA</span><h1 id="editor-title">Editar contenido</h1></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
-        <p>Modifica el contenido en formato JSON. Guarda para actualizar la página pública.</p>
-        <label class="editor-label" for="content-editor">Contenido editorial</label><textarea id="content-editor" spellcheck="false" aria-label="Contenido editorial en formato JSON"></textarea>
+        <p>Modifica cada texto de la página desde estos campos. Los cambios se guardan de forma segura.</p>
+        <div id="editor-fields" class="editor-fields" aria-live="polite"></div>
         <div class="editor-actions"><button id="save" type="button">Guardar cambios <span>↗</span></button><p class="status" id="editor-status" role="status"></p></div>
       </section>
     </main>
