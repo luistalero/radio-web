@@ -14,6 +14,22 @@
     { "number": "06", "mark": "C", "category": "Artistas, músicos y creadores", "title": "Talento de nuestra tierra", "description": "Un escenario para conversar con quienes crean, cantan, escriben y hacen crecer el talento local.", "detail": "Conoce trayectorias, proyectos, procesos creativos y las experiencias detrás de cada propuesta." },
     { "number": "07", "mark": "?", "category": "Misterios, ciencia y curiosidades", "title": "Más allá de lo conocido", "description": "Enigmas, leyendas, fenómenos científicos y preguntas sobre el universo, con curiosidad y contexto.", "detail": "Cada tema se investiga para distinguir los hechos comprobados de las hipótesis y las creencias populares." }
   ],
+  "archive": {
+    "title": "Cada voz tiene",
+    "subtitle": "su propia historia.",
+    "description": "Conoce los programas y sus guiones: una colección de relatos, cultura, actualidad y curiosidad desde nuestra región.",
+    "indexCount": "07",
+    "indexLabel": "GUIONES",
+    "items": [
+      { "number": "01", "title": "Gente de verdad", "category": "Historias humanas y crónicas de vida", "body": "Hay historias que no aparecen en los titulares, pero merecen ser contadas. En este espacio conocemos las experiencias de agricultores, vendedores, artesanos, trabajadores, emprendedores y adultos mayores.\n\nLa crónica inaugural acompaña a Ricardo, quien desde hace más de quince años prepara fritos de madrugada para venderlos en el mercado El Mamón de El Carmen de Bolívar. Detrás de cada venta hay constancia, orgullo y el sueño cumplido de apoyar a su hija hasta la universidad." },
+      { "number": "02", "title": "Canciones con historia", "category": "Música y cultura musical", "body": "Un recorrido por las historias detrás de las melodías: compositores, intérpretes, inspiraciones, significados y épocas.\n\nEl primer programa viaja desde Carmen de Bolívar de Lucho Bermúdez hasta Gotas de lluvia del Grupo Niche y el encuentro de Carlos Vives con Marc Anthony en Cuando nos volvamos a encontrar." },
+      { "number": "03", "title": "El mundo en minutos", "category": "Actualidad nacional e internacional", "body": "Noticias breves, claras y con contexto para entender sus implicaciones sociales. El guion reúne información sobre la situación de seguridad en Catatumbo, las deudas de las EPS con hospitales y la elección de Luz Stella Murgas como presidenta de la ANDI." },
+      { "number": "04", "title": "Voces de nuestra tierra", "category": "Cultura, memoria y tradiciones", "body": "Un programa para descubrir los nombres, costumbres, personajes y saberes de nuestros pueblos. Su primer recorrido se detiene en El Carmen de Bolívar: su historia, el legado de Lucho Bermúdez y sabores como la Chepacorina, memoria dulce de la región." },
+      { "number": "05", "title": "Entre páginas y pantallas", "category": "Libros, películas y series", "body": "Reseñas y recomendaciones para conversar sobre las historias que vemos y leemos. La selección incluye El gato con sombrero, Pacífico, Godzilla Minus One y la novela La perra, de Pilar Quintana." },
+      { "number": "06", "title": "Talento de nuestra tierra", "category": "Artistas, músicos y creadores", "body": "Un escenario de entrevista para escuchar las trayectorias, proyectos, procesos creativos y sueños de quienes hacen crecer el talento de la región. La conversación abre espacio para conocer los retos, metas y redes de cada invitado." },
+      { "number": "07", "title": "Más allá de lo conocido", "category": "Misterios, ciencia y curiosidades", "body": "Casos sorprendentes, leyendas, ciencia y preguntas sobre el universo, siempre distinguiendo los hechos de las hipótesis. El episodio de apertura aborda el accidente de Chernóbil de 1986, sus consecuencias humanas y las lecciones de prevención, seguridad y transparencia." }
+    ]
+  },
   "credits": {
     "author": "Silvia Lunas Talero",
     "role": "Estudiante de Comunicación Social",
