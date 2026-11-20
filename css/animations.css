@@ -41,15 +41,6 @@ html { scroll-behavior: smooth; }
 .program-row.is-expanded .program-more-arrow { transform: rotate(180deg); }
 .program-more-arrow { display: inline-block; transition: transform 180ms ease; }
 
-.program-art-mark {
-  position: relative;
-  z-index: 2;
-  color: var(--fa-ice);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 31px;
-  line-height: 1;
-  text-shadow: 0 0 24px rgba(173, 225, 255, 0.3);
-}
 .program-art-logo {
   position: relative;
   z-index: 2;

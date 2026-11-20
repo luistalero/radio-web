@@ -1,72 +1,94 @@
-const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
-}[character]))
-
-function renderPrograms(programs) {
-  const list = document.querySelector('#program-list')
-  if (!list || !Array.isArray(programs)) return
-
-  list.innerHTML = programs.map((program, index) => {
-    const id = `program-detail-${index + 1}`
-    return `<article class="tilt-card program-row" data-program-row>
-      <div class="program-art" aria-hidden="true"><img class="program-art-logo" src="./assets/icons/light_logo.jpeg" alt=""><span class="program-art-index">${escapeHtml(program.number)}</span></div>
-      <div class="program-info"><span class="program-category">${escapeHtml(program.category)}</span><h3>${escapeHtml(program.title)}</h3><p>${escapeHtml(program.description)}</p><p class="program-detail" id="${id}" hidden>${escapeHtml(program.detail)}</p></div>
-      <button class="program-more" type="button" aria-expanded="false" aria-controls="${id}"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button>
-    </article>`
-  }).join('')
-}
-
-function renderArchive(archive) {
-  const list = document.querySelector('#archive-list')
-  if (!list || !archive || !Array.isArray(archive.items)) return
-
-  const heading = document.querySelector('#scripts-title')
-  if (heading && archive.title) {
-    heading.replaceChildren(document.createTextNode(archive.title))
-    if (archive.subtitle) {
-      const lineBreak = document.createElement('br')
-      const emphasis = document.createElement('em')
-      emphasis.textContent = archive.subtitle
-      heading.append(lineBreak, emphasis)
-    }
-  }
-  setText('#archive-description', archive.description)
-  setText('#archive-index-count', archive.indexCount)
-  setText('#archive-index-label', archive.indexLabel)
-  list.innerHTML = archive.items.map((item, index) => {
-    const paragraphs = String(item.body ?? '').split(/\n\s*\n/).filter(Boolean)
-      .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')
-    return `<details class="script-item"><summary><span class="script-number">${escapeHtml(item.number || String(index + 1).padStart(2, '0'))}</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.category)}</small></span><i aria-hidden="true">+</i></summary><div class="script-content">${paragraphs}</div></details>`
-  }).join('')
-}
-
-function setText(selector, value) {
-  const element = document.querySelector(selector)
-  if (element && value) element.textContent = value
-}
-
-export async function initContent() {
+const escape = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]))
+const img = (item, className = '', eager = false) => `<img class="${className}" src="${escape(item?.src)}" alt="${escape(item?.alt)}"${eager ? ' fetchpriority="high"' : ' loading="lazy"'}>`
+const richText = (value) => String(value ?? '').split(/\n\s*\n/).filter(Boolean).map((text) => `<p>${escape(text)}</p>`).join('')
+const lines = (value) => escape(value).replaceAll('\n', '<br>')
+const firstArchiveSoundCloud = { title: 'Escucha este episodio', url: 'https://soundcloud.com/silvia-luna-140230178/microprograma-radial-los?si=bcc04f95cbd7405f8d6d57972129be01' }
+const isSoundCloudUrl = (value) => {
   try {
-    const baseUrl = window.FRECUENCIA_API_URL || './data'
-    const response = await fetch(`${baseUrl}/content`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('No fue posible cargar el contenido')
-    const content = await response.json()
-    setText('#hero-location', content.hero?.location)
-    setText('#hero-title-text', content.hero?.title)
-    setText('#hero-subtitle', content.hero?.subtitle)
-    setText('#hero-description', content.hero?.description)
-    renderPrograms(content.programs)
-    renderArchive(content.archive)
-    setText('#credits-author', content.credits?.author)
-    setText('#credits-role', content.credits?.role)
-    setText('#credits-email', content.credits?.email)
-    const email = document.querySelector('#credits-email')
-    if (email && content.credits?.email) email.href = `mailto:${content.credits.email}`
-    setText('#credits-institution', content.credits?.institution)
-    setText('#credits-course', content.credits?.course)
-    setText('#credits-school', content.credits?.school)
-    setText('#credits-location-year', content.credits?.locationYear)
-  } catch (error) {
-    console.warn('Se está mostrando el contenido de respaldo.', error)
+    const host = new URL(String(value)).hostname.toLowerCase()
+    return host !== 'on.soundcloud.com' && (host === 'soundcloud.com' || host.endsWith('.soundcloud.com'))
+  } catch { return false }
+}
+
+function soundCloudPlayer(soundcloud = {}) {
+  const url = String(soundcloud.url || '').trim()
+  if (!isSoundCloudUrl(url)) return ''
+  const playerUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%233363f7&auto_play=false&hide_related=true&show_comments=false&show_reposts=false&show_teaser=true&visual=true`
+  return `<div class="archive-audio archive-soundcloud"><span>${escape(soundcloud.title || 'Escuchar en SoundCloud')}</span><iframe title="${escape(soundcloud.title || 'Reproductor de SoundCloud')}" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" loading="lazy" src="${escape(playerUrl)}"></iframe><a href="${escape(url)}" target="_blank" rel="noopener noreferrer">Abrir en SoundCloud <span aria-hidden="true">↗</span></a></div>`
+}
+
+function header(site) {
+  const { branding, navigation } = site
+  return `<header class="site-header"><a class="brand" href="#home" aria-label="${escape(branding.name)}, inicio"><span class="brand-mark" aria-hidden="true">${img({ src: branding.logo, alt: '' })}</span><span class="brand-wordmark"><strong>${escape(branding.firstName)}</strong><span>${escape(branding.secondName)}</span></span></a><button class="mobile-menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú"><span class="menu-glyph" aria-hidden="true"><i></i><i></i></span></button><nav id="primary-navigation" class="primary-navigation" aria-label="Navegación principal">${navigation.map((item) => `<a class="${item.featured ? 'nav-listen' : ''}" href="${escape(item.href)}">${escape(item.label)}${item.featured ? ' <span aria-hidden="true">↗</span>' : ''}</a>`).join('')}</nav></header>`
+}
+
+function hero(site) {
+  const { hero: content } = site
+  return `<section id="home" class="hero-section" aria-labelledby="hero-title"><div class="hero-parallax" aria-hidden="true">${img(content.image, 'hero-image', true)}</div><div class="hero-shade" aria-hidden="true"></div><div class="hero-grid" aria-hidden="true"></div><div class="hero-copy"><div class="eyebrow hero-eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span><span>${escape(content.location)}</span></div><h1 id="hero-title"><span id="hero-title-text">${escape(content.title)}</span><span>${escape(content.subtitle)}</span></h1><p class="hero-description">${escape(content.description)}</p><div class="hero-actions">${content.actions.map((item, index) => `<a class="button ${index ? 'button-glass' : 'button-primary'}" href="${escape(item.href)}">${index ? '' : '<span class="button-signal" aria-hidden="true">〰</span>'}${escape(item.label)}${item.arrow ? ' <span aria-hidden="true">↗</span>' : ''}</a>`).join('')}</div></div><div class="hero-orb" id="hero-orb" aria-hidden="true"><div class="orb-fallback"><span></span><span></span><span></span></div></div><a class="scroll-cue" href="${escape(content.scroll.href)}"><span>${escape(content.scroll.label)}</span><span class="scroll-arrow" aria-hidden="true">↓</span></a><div class="hero-index" aria-hidden="true"><span>${escape(content.indexCurrent)}</span><i></i>${escape(content.indexTotal)}</div></section>`
+}
+
+function live(site) {
+  const c = site.live
+  if (c.caster?.publicToken) {
+    return `<section id="live" class="section live-section" aria-labelledby="live-title"><div class="section-orbit live-orbit" aria-hidden="true"></div><div class="section-container live-layout"><div class="live-intro reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><h2 id="live-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p><div class="live-meta"><span class="status-dot" aria-hidden="true"></span><span id="signal-state">${escape(c.signalState)}</span></div></div><div class="live-player-wrap reveal"><div class="live-player caster-launcher"><div class="player-topline"><div class="live-badge"><span class="live-indicator" aria-hidden="true"></span><span id="player-badge">${escape(c.badge)}</span></div><span class="player-frequency">${escape(c.frequency)}</span></div><div class="waveform caster-waveform" aria-hidden="true">${Array.from({ length: 48 }, (_, index) => `<i style="--bar-height:${16 + ((index * 17 + index * index * 3) % 28)}%;--bar-index:${index}"></i>`).join('')}</div><div class="track-row"><div class="track-icon" aria-hidden="true">${img({ src: site.branding.logo, alt: '' })}</div><div class="track-copy"><span class="track-label">${escape(c.trackLabel)}</span><strong>${escape(c.trackTitle)}</strong><span>${escape(c.trackDescription)}</span></div><span class="track-pending">${escape(c.trackSchedule)}</span></div><div class="player-controls"><button class="play-button" id="caster-open" type="button" aria-haspopup="dialog" aria-controls="caster-modal" aria-label="Abrir reproductor de Frecuencia Abierta"><span class="play-glyph" aria-hidden="true">▶</span></button><div class="player-action-copy"><strong>${escape(c.playLabel)}</strong><span>Abre el reproductor en vivo</span></div></div><p class="player-status" id="player-status" role="status" aria-live="polite" hidden></p></div><div class="listener-note"><span aria-hidden="true">◉</span><span>${escape(c.note)}</span></div></div></div><dialog class="caster-modal" id="caster-modal" aria-labelledby="caster-modal-title"><div class="caster-modal-head"><div><span>FRECUENCIA ABIERTA</span><h2 id="caster-modal-title">Escucha en vivo</h2></div><button type="button" class="caster-modal-close" id="caster-close" aria-label="Cerrar reproductor">×</button></div><div class="caster-embed-frame"><div id="caster-player" class="cstrEmbed" data-type="newStreamPlayer" data-publicToken="${escape(c.caster.publicToken)}" data-theme="${escape(c.caster.theme || 'dark')}" data-color="${escape(c.caster.color || '669DD3')}" data-channelId="${escape(c.caster.channelId || '')}" data-rendered="false"><a href="https://www.caster.fm">Shoutcast Hosting</a> <a href="https://www.caster.fm">Stream Hosting</a> <a href="https://www.caster.fm">Radio Server Hosting</a></div></div></dialog></section>`
   }
+  return `<section id="live" class="section live-section" aria-labelledby="live-title"><div class="section-orbit live-orbit" aria-hidden="true"></div><div class="section-container live-layout"><div class="live-intro reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><h2 id="live-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p><div class="live-meta"><span class="status-dot" aria-hidden="true"></span><span id="signal-state">${escape(c.signalState)}</span></div></div><div class="live-player-wrap reveal"><div class="live-player"><div class="player-topline"><div class="live-badge"><span class="live-indicator" aria-hidden="true"></span><span id="player-badge">${escape(c.badge)}</span></div><span class="player-frequency">${escape(c.frequency)}</span></div><div class="waveform" id="waveform" aria-hidden="true"></div><div class="track-row"><div class="track-icon" aria-hidden="true">${img({ src: site.branding.logo, alt: '' })}</div><div class="track-copy"><span class="track-label">${escape(c.trackLabel)}</span><strong>${escape(c.trackTitle)}</strong><span>${escape(c.trackDescription)}</span></div><span class="track-pending">${escape(c.trackSchedule)}</span></div><div class="player-controls"><button class="play-button" id="play-toggle" type="button" aria-label="Intentar escuchar la transmisión en vivo"><span class="play-glyph" aria-hidden="true">▶</span></button><div class="player-action-copy"><strong id="play-label">${escape(c.playLabel)}</strong><span id="connection-label">${escape(c.connectionLabel)}</span></div><label class="volume-control" for="radio-volume"><span>Volumen</span><input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.8"><output id="volume-output" for="radio-volume">80%</output></label></div><audio id="radio-audio" preload="none"></audio><p class="player-status" id="player-status" role="status" aria-live="polite" hidden></p></div><div class="listener-note"><span aria-hidden="true">◉</span><span>${escape(c.note)}</span></div></div></div></section>`
+}
+
+function programs(site) {
+  const c = site.programs
+  return `<section id="programs" class="section programs-section" aria-labelledby="programs-title"><div class="section-container"><div class="programs-heading reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><div class="programs-heading-row"><div><h2 id="programs-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p></div><div class="program-count"><span>${escape(c.count)}</span><i>${lines(c.countLabel)}</i></div></div></div><div class="program-list" id="program-list">${c.items.map((item, index) => `<article class="tilt-card program-row" data-program-row><div class="program-art" aria-hidden="true">${img({ src: site.branding.logo, alt: '' }, 'program-art-logo')}<span class="program-art-index">${escape(item.number)}</span></div><div class="program-info"><span class="program-category">${escape(item.category)}</span><h3>${escape(item.title)}</h3><p>${escape(item.description)}</p><p class="program-detail" id="program-detail-${index}" hidden>${escape(item.detail)}</p></div><button class="program-more" type="button" aria-expanded="false" aria-controls="program-detail-${index}"><span class="program-more-label">Conocer más</span><span class="program-more-arrow" aria-hidden="true">↘</span></button></article>`).join('')}</div><div class="schedule" aria-labelledby="schedule-title"><div class="schedule-heading"><h3 id="schedule-title">${escape(c.schedule.title)}</h3></div><div class="schedule-table-wrap" tabindex="0"><table><caption>${escape(c.schedule.caption)}</caption><thead><tr>${c.schedule.headers.map((item) => `<th scope="col">${escape(item)}</th>`).join('')}</tr></thead><tbody>${c.schedule.items.map((item) => `<tr><th scope="row">${escape(item.day)}</th><td>${escape(item.time)}</td><td>${escape(item.program)}</td><td>${escape(item.duration)}</td></tr>`).join('')}</tbody></table></div></div></div></section>`
+}
+
+function territory(site) {
+  const c = site.territory
+  return `<section id="territory" class="section territory-section" aria-labelledby="territory-title"><div class="territory-image-wrap">${img(c.image, 'territory-image')}<div class="territory-image-shade" aria-hidden="true"></div><div class="image-caption"><span>${escape(c.imageCaption)}</span><i aria-hidden="true"></i></div><div class="territory-image-title">${escape(c.imageTitle)}<br><em>${escape(c.imageSubtitle)}</em></div></div><div class="territory-copy"><div class="reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><h2 id="territory-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p class="territory-lede">${escape(c.description)}</p><div class="territory-facts">${c.facts.map((item) => `<div class="territory-fact"><span class="fact-symbol" aria-hidden="true">${escape(item.symbol)}</span><span><strong>${escape(item.title)}</strong><small>${escape(item.description)}</small></span></div>`).join('')}</div><a class="text-link" href="${escape(c.link.href)}">${escape(c.link.label)} <span aria-hidden="true">↗</span></a></div></div></section>`
+}
+
+function stories(site) {
+  const c = site.stories
+  return `<section id="stories" class="section stories-section" aria-labelledby="stories-title"><div class="section-container"><div class="stories-heading reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><div class="stories-heading-row"><div><h2 id="stories-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p></div><span class="stories-index">${lines(c.indexLabel)}</span></div></div><div class="story-grid">${c.items.map((item) => `<article class="tilt-card story-card reveal"><div class="story-image">${img(item.image)}<div class="story-image-shade" aria-hidden="true"></div><span class="story-number">${escape(item.number)}</span></div><div class="story-copy"><span class="story-type">${escape(item.type)}</span><h3>${escape(item.title)}</h3><p>${escape(item.description)}</p><a href="${escape(item.link.href)}" class="story-link"><span>${escape(item.link.label)}</span><span aria-hidden="true">↗</span></a></div></article>`).join('')}</div><p class="story-note">${escape(c.note)}</p></div></section>`
+}
+
+function archive(site) {
+  const c = site.archive
+  return `<section id="scripts" class="section scripts-section" aria-labelledby="scripts-title"><div class="scripts-glow" aria-hidden="true"></div><div class="section-container"><div class="scripts-heading reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><div class="scripts-heading-row"><div><h2 id="scripts-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p></div><span class="scripts-index">${escape(c.indexCount)}<br><small>${escape(c.indexLabel)}</small></span></div></div><div class="script-list reveal">${c.items.map((item) => `<details class="script-item"><summary><span class="script-number">${escape(item.number)}</span><span><strong>${escape(item.title)}</strong><small>${escape(item.category)}</small></span><i aria-hidden="true">+</i></summary><div class="script-content">${richText(item.body)}${soundCloudPlayer(item.soundcloud)}${item.audio?.src ? `<div class="archive-audio"><span>${escape(item.audio.title || 'Testimonio sonoro')}</span><audio controls preload="none" src="${escape(item.audio.src)}"></audio></div>` : ''}</div></details>`).join('')}</div></div></section>`
+}
+
+function academic(site) {
+  const c = site.academic
+  if (!c) return ''
+  const list = (items = []) => `<ul class="academic-list">${items.map((item) => `<li>${escape(item)}</li>`).join('')}</ul>`
+  return `<section id="project" class="section academic-section" aria-labelledby="academic-title"><div class="section-container"><div class="academic-heading"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><h2 id="academic-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2></div><div class="academic-grid"><article><h3>${escape(c.sample.title)}</h3><p>${escape(c.sample.description)}</p><h3>${escape(c.station.title)}</h3><p>${escape(c.station.description)}</p><h4>Justificación</h4><p>${escape(c.station.justification)}</p></article><article><h3>Objetivos</h3>${list(c.station.objectives)}<h3>Públicos</h3>${list(c.station.audiences)}</article></div><div class="academic-grid"><article><h3>${escape(c.challenges.title)}</h3>${list(c.challenges.items)}<h3>${escape(c.style.title)}</h3><p>${escape(c.style.description)}</p></article><article><h3>${escape(c.functions.title)}</h3><div class="academic-functions">${c.functions.items.map((item) => `<div><strong>${escape(item.title)}</strong><p>${escape(item.description)}</p></div>`).join('')}</div></article></div><div class="academic-production"><h3>${escape(c.formats.title)}</h3><p><strong>${escape(c.formats.duration)}</strong> · ${c.formats.items.map(escape).join(' · ')}</p><p>Campos del guion: ${c.formats.scriptFields.map(escape).join(' · ')}.</p><p>${escape(c.formats.note)}</p><h3>${escape(c.production.title)}</h3><div class="academic-grid"><div><h4>Recursos humanos</h4>${list(c.production.human)}<h4>Recursos logísticos</h4>${list(c.production.logistics)}</div><div><h4>Equipos tecnológicos</h4>${list(c.production.technology)}<h4>Tiempo de ejecución</h4><p>${escape(c.production.timeline)}</p><h4>Presupuesto estimado</h4><p>${escape(c.production.budget)}</p><h4>Reflexiones y aprendizajes</h4><p>${escape(c.production.reflection)}</p></div></div></div></div></section>`
+}
+
+function participation(site) {
+  const c = site.participation
+  return `<section id="participate" class="section participate-section" aria-labelledby="participate-title"><div class="section-container participate-layout"><div class="participate-intro reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><h2 id="participate-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p><div class="participate-aside"><span>${escape(c.asideNumber)}</span><i aria-hidden="true"></i><span>${escape(c.asideLabel)}</span></div></div><div class="participate-form-wrap reveal"><form class="participate-form" id="participation-form"><div class="form-row"><label class="form-field"><span>${escape(c.fields.name)}</span><input name="name" autocomplete="name" required minlength="2" placeholder="${escape(c.placeholders.name)}"></label><label class="form-field"><span>${escape(c.fields.email)}</span><input name="email" type="email" autocomplete="email" required placeholder="${escape(c.placeholders.email)}"></label></div><label class="form-field"><span>${escape(c.fields.topic)}</span><input name="topic" required minlength="3" placeholder="${escape(c.placeholders.topic)}"></label><label class="form-field"><span>${escape(c.fields.message)}</span><textarea name="message" rows="4" required minlength="12" placeholder="${escape(c.placeholders.message)}"></textarea></label><p class="form-privacy">${escape(c.privacy)}</p><button class="button button-primary form-submit" type="submit">${escape(c.buttonLabel)} <span aria-hidden="true">↗</span></button><p class="form-status" id="form-status" role="status" aria-live="polite" tabindex="-1" hidden></p></form></div></div></section>`
+}
+
+function footer(site) {
+  const { branding, footer: c } = site
+  return `<footer class="site-footer"><div class="section-container"><section class="credits-panel" aria-labelledby="credits-title"><div class="credits-signal" aria-hidden="true"><span></span><span></span><span></span></div><div><span class="credits-kicker">${escape(c.credits.kicker)}</span><h2 id="credits-title">${escape(branding.name)}</h2><p>${escape(c.credits.description)}</p></div><div class="credits-data"><p><strong>${escape(c.credits.authorPrefix)} <span>${escape(c.credits.author)}</span></strong><br><span>${escape(c.credits.role)}</span></p><a href="mailto:${escape(c.credits.email)}">${escape(c.credits.email)}</a></div><div class="credits-data"><p>${c.credits.details.map(escape).join('<br>')}</p></div></section><div class="footer-main"><div class="footer-brand-block"><a class="brand footer-brand" href="#home" aria-label="${escape(branding.name)}, volver al inicio"><span class="brand-mark" aria-hidden="true">${img({ src: branding.logo, alt: '' })}</span><span class="brand-wordmark"><strong>${escape(branding.firstName)}</strong><span>${escape(branding.secondName)}</span></span></a><p>${lines(c.tagline)}</p></div><div class="footer-nav-block"><h2>${escape(c.navigationTitle)}</h2><nav aria-label="Navegación del pie de página">${c.links.map((item) => `<a href="${escape(item.href)}">${escape(item.label)} <span aria-hidden="true">↗</span></a>`).join('')}</nav></div><div class="footer-contact-block"><h2>${escape(c.locationTitle)}</h2><p>${lines(c.location)}</p><span class="footer-note">${lines(c.note)}</span></div><a class="back-to-top" href="#home" aria-label="Volver arriba"><span aria-hidden="true">↑</span></a></div><div class="footer-bottom"><span>© <span id="current-year"></span> ${escape(branding.name)}</span><span>${escape(c.bottomText)}</span><a class="owner-access" href="./admin/" aria-label="Acceso privado de administración" title="Acceso privado">${escape(c.adminLabel)}</a></div></div></footer>`
+}
+
+export function renderSite(site) {
+  const root = document.querySelector('#site-root')
+  if (!root) return
+  const firstArchiveItem = site.archive?.items?.[0]
+  if (firstArchiveItem && (!Object.hasOwn(firstArchiveItem, 'soundcloud') || !isSoundCloudUrl(firstArchiveItem.soundcloud?.url))) firstArchiveItem.soundcloud = { ...firstArchiveSoundCloud }
+  root.innerHTML = `${header(site)}<main id="main-content" class="radio-experience">${hero(site)}${live(site)}${programs(site)}${territory(site)}${stories(site)}${archive(site)}${academic(site)}${participation(site)}</main>${footer(site)}`
+  document.title = site.meta?.title || site.branding.name
+  const description = document.querySelector('meta[name="description"]')
+  if (description && site.meta?.description) description.content = site.meta.description
+}
+
+export async function loadContent() {
+  try {
+    const response = await fetch(`${window.FRECUENCIA_API_URL || '/api'}/content`, { cache: 'no-cache' })
+    if (response.ok) return response.json()
+  } catch { /* La vista estática usa el contenido inicial como respaldo. */ }
+  const fallback = await fetch('./data/content.json', { cache: 'no-cache' })
+  if (!fallback.ok) throw new Error('No fue posible cargar el contenido')
+  return fallback.json()
 }

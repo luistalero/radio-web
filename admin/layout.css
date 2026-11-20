@@ -1,0 +1,12 @@
+@media (min-width: 761px) {
+  .admin-shell { width: min(calc(100% - 72px), 1320px); padding-block: 38px 68px; }
+  .editor-card { padding: clamp(34px, 4vw, 64px); }
+  .editor-card > p { max-width: 720px; }
+  .admin-section-body { padding: 28px; }
+}
+
+@media (min-width: 1180px) {
+  .admin-shell { width: min(calc(100% - 112px), 1440px); }
+  .editor-fields { gap: 22px; }
+  .field-section { padding: 24px; }
+}

@@ -1,6 +1,36 @@
-const RADIO_STREAM_URL = ''
+export function initCasterPlayer(config = {}) {
+  const player = document.querySelector('#caster-player')
+  const modal = document.querySelector('#caster-modal')
+  const openButton = document.querySelector('#caster-open')
+  const closeButton = document.querySelector('#caster-close')
+  const publicToken = String(config.publicToken || '').trim()
+  if (!player || !modal || !openButton || !publicToken) return
 
-export function initAudioPlayer() {
+  function loadWidget() {
+    if (document.querySelector('script[data-caster-widget]')) return
+    const script = document.createElement('script')
+    script.src = 'https://cdn.cloud.caster.fm/widgets/embed.js'
+    script.async = true
+    script.dataset.casterWidget = 'true'
+    script.onerror = () => {
+      const status = document.querySelector('#player-status')
+      if (status) {
+        status.textContent = 'No fue posible cargar el reproductor en este momento. Inténtalo de nuevo más tarde.'
+        status.hidden = false
+      }
+    }
+    document.head.append(script)
+  }
+
+  openButton.addEventListener('click', () => {
+    modal.showModal()
+    loadWidget()
+  })
+  closeButton?.addEventListener('click', () => modal.close())
+  modal.addEventListener('click', (event) => { if (event.target === modal) modal.close() })
+}
+
+export function initAudioPlayer(stream = '') {
   const audio = document.querySelector('#radio-audio')
   const playButton = document.querySelector('#play-toggle')
   const waveform = document.querySelector('#waveform')
@@ -14,7 +44,7 @@ export function initAudioPlayer() {
 
   if (!audio || !playButton || !waveform || !status) return
 
-  const streamUrl = RADIO_STREAM_URL.trim()
+  const streamUrl = String(stream).trim()
   const bars = document.createDocumentFragment()
   for (let index = 0; index < 48; index += 1) {
     const bar = document.createElement('i')
