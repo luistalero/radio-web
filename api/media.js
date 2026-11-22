@@ -6,6 +6,7 @@ const allowedContentTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avi
 export default async function handler(request, response) {
   if (request.method !== 'POST') return response.status(405).json({ error: 'Método no permitido.' })
   try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID) return response.status(503).json({ error: 'La carga de audios no está configurada. Conecta un almacén Vercel Blob al proyecto y vuelve a intentarlo.' })
     const uploadBody = await body(request)
     if (uploadBody.type === 'blob.generate-client-token' && !isAuthenticated(request)) return response.status(401).json({ error: 'Sesión no autorizada.' })
     const result = await handleUpload({

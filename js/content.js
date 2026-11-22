@@ -3,6 +3,8 @@ const img = (item, className = '', eager = false) => `<img class="${className}" 
 const richText = (value) => String(value ?? '').split(/\n\s*\n/).filter(Boolean).map((text) => `<p>${escape(text)}</p>`).join('')
 const lines = (value) => escape(value).replaceAll('\n', '<br>')
 const firstArchiveSoundCloud = { title: 'Escucha este episodio', url: 'https://soundcloud.com/silvia-luna-140230178/microprograma-radial-los?si=bcc04f95cbd7405f8d6d57972129be01' }
+const localPreview = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:'
+const localContentKey = 'frecuencia-abierta:local-content'
 const isSoundCloudUrl = (value) => {
   try {
     const host = new URL(String(value)).hostname.toLowerCase()
@@ -39,6 +41,14 @@ function livePlayer(site) {
   const c = site.live
   const caster = c.caster || {}
   return `<section id="live" class="section live-section" aria-labelledby="live-title"><div class="section-orbit live-orbit" aria-hidden="true"></div><div class="section-container live-layout"><div class="live-intro reveal"><div class="section-kicker"><span>${escape(c.kicker)}</span><span class="kicker-line" aria-hidden="true"></span></div><h2 id="live-title">${escape(c.title)}<br><em>${escape(c.subtitle)}</em></h2><p>${escape(c.description)}</p><div class="live-meta"><span class="status-dot" aria-hidden="true"></span><span id="signal-state">${escape(c.signalState)}</span></div></div><div class="live-player-wrap reveal"><div class="live-player"><div class="player-topline"><div class="live-badge"><span class="live-indicator" aria-hidden="true"></span><span id="player-badge">${escape(c.badge)}</span></div><span class="player-frequency">${escape(c.frequency)}</span></div><div class="waveform" id="waveform" aria-hidden="true"></div><div class="track-row"><div class="track-icon" aria-hidden="true">${img({ src: site.branding.logo, alt: '' })}</div><div class="track-copy"><span class="track-label" id="track-label">${escape(c.trackLabel)}</span><strong id="track-title">${escape(c.trackTitle)}</strong><span id="track-description">${escape(c.trackDescription)}</span></div><span class="track-pending" id="track-schedule">${escape(c.trackSchedule)}</span></div><div class="player-controls"><button class="play-button" id="play-toggle" type="button" aria-haspopup="dialog" aria-controls="caster-modal" aria-label="Escuchar Frecuencia Abierta"><span class="play-glyph" aria-hidden="true">▶</span></button><div class="player-action-copy"><strong id="play-label">${escape(c.playLabel)}</strong><span id="connection-label">${escape(c.connectionLabel)}</span></div><label class="volume-control" for="radio-volume"><span>Volumen</span><input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.8"><output id="volume-output" for="radio-volume">80%</output></label></div><audio id="radio-audio" preload="none"></audio><div id="soundcloud-player" hidden></div><p class="player-status" id="player-status" role="status" aria-live="polite" hidden></p></div><div class="listener-note"><span aria-hidden="true">◉</span><span>${escape(c.note)}</span></div></div></div><dialog class="caster-modal" id="caster-modal" aria-labelledby="caster-modal-title"><div class="caster-modal-head"><div><span>FRECUENCIA ABIERTA</span><h2 id="caster-modal-title">Escucha en vivo</h2></div><button type="button" class="caster-modal-close" id="caster-close" aria-label="Cerrar reproductor">×</button></div><div class="caster-embed-frame"><div id="caster-player" class="cstrEmbed" data-type="newStreamPlayer" data-publicToken="${escape(caster.publicToken)}" data-theme="${escape(caster.theme || 'dark')}" data-color="${escape(caster.color || '669DD3')}" data-channelId="${escape(caster.channelId)}" data-rendered="false"><a href="https://www.caster.fm">Shoutcast Hosting</a> <a href="https://www.caster.fm">Stream Hosting</a> <a href="https://www.caster.fm">Radio Server Hosting</a></div></div></dialog></section>`
+}
+
+export function refreshLiveSection(site) {
+  const current = document.querySelector('#live')
+  if (!current) return
+  const template = document.createElement('template')
+  template.innerHTML = livePlayer(site)
+  current.replaceWith(template.content.firstElementChild)
 }
 
 function projectDossier(site) {
@@ -99,6 +109,12 @@ export function renderSite(site) {
 }
 
 export async function loadContent() {
+  if (localPreview) {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(localContentKey) || '')
+      if (saved?.branding && saved?.live) return saved
+    } catch { /* El contenido local se regenerará desde el archivo inicial. */ }
+  }
   try {
     const response = await fetch(`${window.FRECUENCIA_API_URL || '/api'}/content`, { cache: 'no-cache' })
     if (response.ok) return response.json()

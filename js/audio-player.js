@@ -1,4 +1,3 @@
-const api = window.FRECUENCIA_API_URL || '/api'
 const text = (value) => String(value || '').trim()
 const modeOf = (live) => live?.mode === 'fallback' ? 'fallback' : 'caster'
 let soundCloudApi
@@ -24,7 +23,7 @@ function loadSoundCloudApi() {
   return soundCloudApi
 }
 
-export function initRadioPlayer(initialLive = {}) {
+export function initRadioPlayer(initialLive = {}, { openCasterOnStart = false } = {}) {
   const audio = document.querySelector('#radio-audio')
   const playButton = document.querySelector('#play-toggle')
   const waveform = document.querySelector('#waveform')
@@ -34,7 +33,7 @@ export function initRadioPlayer(initialLive = {}) {
   const soundCloudPlayer = document.querySelector('#soundcloud-player')
   const volume = document.querySelector('#radio-volume')
   const volumeOutput = document.querySelector('#volume-output')
-  if (!audio || !playButton || !waveform || !status) return
+  if (!audio || !playButton || !waveform || !status) return () => {}
 
   const ui = {
     badge: document.querySelector('#player-badge'), signal: document.querySelector('#signal-state'), label: document.querySelector('#play-label'),
@@ -45,12 +44,14 @@ export function initRadioPlayer(initialLive = {}) {
   let mode = modeOf(live)
   let queue = []
   let queueIndex = -1
-  let userStartedFallback = false
+  let phase = 'opening'
+  let currentTrack = null
+  let fallbackPlaying = false
   let soundCloudWidget = null
 
   for (let index = 0; index < 48; index += 1) {
     const bar = document.createElement('i')
-    bar.style.setProperty('--bar-height', `${16 + ((index * 17 + index * index * 3) % 28)}%`)
+    bar.style.setProperty('--bar-height', String(16 + ((index * 17 + index * index * 3) % 28)) + '%')
     bar.style.setProperty('--bar-index', String(index))
     waveform.append(bar)
   }
@@ -58,6 +59,7 @@ export function initRadioPlayer(initialLive = {}) {
   const announce = (message) => { status.textContent = message; status.hidden = false }
   const hideStatus = () => { status.hidden = true; status.textContent = '' }
   const tracks = () => (live.fallback?.tracks || []).filter((track) => text(track?.src))
+  const validTrack = (track) => track && text(track.src)
   const shuffle = (items) => {
     const copy = [...items]
     for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -68,23 +70,23 @@ export function initRadioPlayer(initialLive = {}) {
   }
 
   function setPlaying(playing) {
+    fallbackPlaying = playing
     waveform.classList.toggle('is-playing', playing)
     playButton.querySelector('.play-glyph').textContent = playing ? 'Ⅱ' : '▶'
     if (mode === 'fallback') {
-      playButton.setAttribute('aria-label', playing ? 'Pausar programación grabada' : 'Escuchar programación grabada')
-      ui.label.textContent = playing ? 'Programación al aire' : 'Escuchar programación'
-      ui.connection.textContent = playing ? 'Historias y voces grabadas' : 'Lista preparada'
+      playButton.setAttribute('aria-label', playing ? 'Pausar programación grabada' : 'Reanudar programación grabada')
+      ui.label.textContent = playing ? 'Programación al aire' : 'Programación pausada'
+      ui.connection.textContent = playing ? 'Historias y voces grabadas' : 'Pulsa para continuar'
     }
   }
 
   function paint() {
     const fallback = mode === 'fallback'
-    const track = queue[queueIndex]
     ui.badge.textContent = fallback ? 'PROGRAMACIÓN GRABADA' : 'EN VIVO'
     ui.signal.textContent = fallback ? 'PROGRAMACIÓN AUTOMÁTICA' : 'SEÑAL EN VIVO'
-    ui.trackLabel.textContent = fallback ? 'AHORA SUENA' : (live.trackLabel || 'TRANSMISIÓN')
-    ui.title.textContent = fallback ? (track?.title || live.fallback?.title || 'Programación grabada') : (live.trackTitle || 'Frecuencia Abierta')
-    ui.description.textContent = fallback ? (track?.artist || live.fallback?.description || 'Historias, voces y música') : (live.trackDescription || 'Radio comunitaria')
+    ui.trackLabel.textContent = fallback ? (phase === 'opening' ? 'PRESENTACIÓN' : phase === 'interlude' ? 'IDENTIFICACIÓN' : 'AHORA SUENA') : (live.trackLabel || 'TRANSMISIÓN')
+    ui.title.textContent = fallback ? (currentTrack?.title || live.fallback?.title || 'Programación grabada') : (live.trackTitle || 'Frecuencia Abierta')
+    ui.description.textContent = fallback ? (currentTrack?.artist || live.fallback?.description || 'Historias, voces y música') : (live.trackDescription || 'Radio comunitaria')
     ui.schedule.textContent = fallback ? 'En bucle' : (live.trackSchedule || 'En vivo')
     if (!fallback) {
       waveform.classList.remove('is-playing')
@@ -92,7 +94,7 @@ export function initRadioPlayer(initialLive = {}) {
       playButton.setAttribute('aria-label', 'Abrir reproductor de la señal en vivo')
       ui.label.textContent = 'Escucha la señal'
       ui.connection.textContent = 'Reproductor oficial de Caster.fm'
-    } else setPlaying(!audio.paused)
+    }
   }
 
   function loadCasterWidget() {
@@ -106,65 +108,38 @@ export function initRadioPlayer(initialLive = {}) {
     document.head.append(script)
   }
 
-  function resetCasterWidget() {
-    const player = document.querySelector('#caster-player')
-    if (!player?.querySelector('iframe')) return
-    player.replaceChildren()
-    ;['Shoutcast Hosting', 'Stream Hosting', 'Radio Server Hosting'].forEach((label) => {
-      const link = document.createElement('a')
-      link.href = 'https://www.caster.fm'
-      link.textContent = label
-      player.append(link, ' ')
-    })
-    player.dataset.rendered = 'false'
-    document.querySelector('script[data-caster-widget]')?.remove()
-  }
-
   function stopFallback() {
     soundCloudWidget?.pause()
     soundCloudWidget = null
-    if (soundCloudPlayer) soundCloudPlayer.replaceChildren()
+    soundCloudPlayer?.replaceChildren()
     audio.pause()
     audio.removeAttribute('src')
     audio.load()
+    currentTrack = null
     setPlaying(false)
-  }
-
-  async function playNext() {
-    if (!queue.length || queueIndex >= queue.length - 1) {
-      queue = shuffle(tracks())
-      queueIndex = -1
-    }
-    queueIndex += 1
-    const track = queue[queueIndex]
-    if (!track) return announce('Aún no hay audios en la programación grabada. Agrégalos desde el administrador.')
-    if (isSoundCloudUrl(track.src)) return playSoundCloud(track)
-    audio.src = track.src
-    paint()
-    try {
-      await audio.play()
-      hideStatus()
-    } catch {
-      announce('Pulsa reproducir para iniciar la programación grabada.')
-    }
   }
 
   async function playSoundCloud(track) {
     if (!soundCloudPlayer) return announce('No fue posible preparar este audio de SoundCloud.')
-    stopFallback()
+    soundCloudWidget?.pause()
+    soundCloudPlayer.replaceChildren()
+    audio.pause()
+    audio.removeAttribute('src')
+    audio.load()
     const frame = document.createElement('iframe')
     frame.title = track.title || 'Audio de SoundCloud'
     frame.allow = 'autoplay'
-    frame.src = `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.src)}&auto_play=true&hide_related=true&show_comments=false&show_reposts=false&show_teaser=false&visual=false`
-    soundCloudPlayer.replaceChildren(frame)
+    frame.src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(track.src) + '&auto_play=true&hide_related=true&show_comments=false&show_reposts=false&show_teaser=false&visual=false'
+    soundCloudPlayer.append(frame)
     try {
       const SC = await loadSoundCloudApi()
       soundCloudWidget = SC.Widget(frame)
       await new Promise((resolve) => soundCloudWidget.bind(SC.Widget.Events.READY, resolve))
       soundCloudWidget.bind(SC.Widget.Events.FINISH, () => void playNext())
+      soundCloudWidget.bind(SC.Widget.Events.PLAY, () => setPlaying(true))
+      soundCloudWidget.bind(SC.Widget.Events.PAUSE, () => setPlaying(false))
+      soundCloudWidget.setVolume(Math.round(audio.volume * 100))
       soundCloudWidget.play()
-      paint()
-      setPlaying(true)
       hideStatus()
     } catch {
       announce('No fue posible reproducir este audio de SoundCloud. Intentando el siguiente…')
@@ -172,11 +147,47 @@ export function initRadioPlayer(initialLive = {}) {
     }
   }
 
-  async function useFallback() {
+  async function playTrack(track) {
+    currentTrack = track
+    paint()
+    if (isSoundCloudUrl(track.src)) return playSoundCloud(track)
+    soundCloudWidget?.pause()
+    soundCloudWidget = null
+    soundCloudPlayer?.replaceChildren()
+    audio.src = track.src
+    try {
+      await audio.play()
+      hideStatus()
+    } catch { announce('Pulsa reproducir para iniciar la programación grabada.') }
+  }
+
+  async function playNext() {
     if (mode !== 'fallback') return
     if (!tracks().length) return announce('Aún no hay audios en la programación grabada. Agrégalos desde el administrador.')
-    if (audio.paused || !audio.src) await playNext()
-    else audio.pause()
+    if (phase === 'opening') {
+      phase = 'program'
+      if (validTrack(live.fallback?.opening)) return playTrack(live.fallback.opening)
+    }
+    if (phase === 'interlude') {
+      phase = 'program'
+      if (validTrack(live.fallback?.interlude)) return playTrack(live.fallback.interlude)
+    }
+    if (!queue.length || queueIndex >= queue.length - 1) {
+      queue = shuffle(tracks())
+      queueIndex = -1
+    }
+    queueIndex += 1
+    phase = 'interlude'
+    return playTrack(queue[queueIndex])
+  }
+
+  async function toggleFallback() {
+    if (mode !== 'fallback') return
+    if (!currentTrack) return playNext()
+    if (soundCloudWidget) return fallbackPlaying ? soundCloudWidget.pause() : soundCloudWidget.play()
+    if (audio.paused) {
+      try { await audio.play(); hideStatus() } catch { announce('Pulsa reproducir para iniciar la programación grabada.') }
+    } else audio.pause()
   }
 
   function openCaster() {
@@ -186,53 +197,46 @@ export function initRadioPlayer(initialLive = {}) {
     loadCasterWidget()
   }
 
-  function applyMode(nextMode, changedRemotely = false) {
-    const wasFallbackPlaying = mode === 'fallback' && !audio.paused
+  function applyMode(nextMode) {
     mode = nextMode
-    if (mode === 'caster') {
-      stopFallback()
-      paint()
-      if (changedRemotely) openCaster()
-      return
-    }
-    resetCasterWidget()
-    if (modal?.open) modal.close()
+    stopFallback()
+    if (mode === 'fallback') { phase = 'opening'; queue = []; queueIndex = -1; if (modal?.open) modal.close() }
     paint()
-    if (wasFallbackPlaying || (changedRemotely && userStartedFallback)) void useFallback()
   }
 
-  playButton.addEventListener('click', () => {
-    if (mode === 'caster') openCaster()
-    else { userStartedFallback = true; void useFallback() }
-  })
-  closeCaster?.addEventListener('click', () => modal.close())
-  modal?.addEventListener('click', (event) => { if (event.target === modal) modal.close() })
-  audio.addEventListener('play', () => setPlaying(true))
-  audio.addEventListener('pause', () => setPlaying(false))
-  audio.addEventListener('ended', () => void playNext())
-  audio.addEventListener('error', () => { announce('No fue posible reproducir este audio. Intentando el siguiente…'); void playNext() })
-
-  if (volume && volumeOutput) {
+  const onPlayClick = () => { if (mode === 'caster') openCaster(); else void toggleFallback() }
+  const onCloseCaster = () => modal.close()
+  const onModalClick = (event) => { if (event.target === modal) modal.close() }
+  const onAudioPlay = () => setPlaying(true)
+  const onAudioPause = () => setPlaying(false)
+  const onAudioEnded = () => void playNext()
+  const onAudioError = () => { if (audio.src) { announce('No fue posible reproducir este audio. Intentando el siguiente…'); void playNext() } }
+  const onVolume = () => {
     audio.volume = Number(volume.value)
-    volume.addEventListener('input', () => {
-      audio.volume = Number(volume.value)
-      volumeOutput.value = `${Math.round(audio.volume * 100)}%`
-    })
+    soundCloudWidget?.setVolume(Math.round(audio.volume * 100))
+    volumeOutput.value = String(Math.round(audio.volume * 100)) + '%'
   }
-
-  async function refreshMode() {
-    try {
-      const response = await fetch(`${api}/content`, { cache: 'no-store' })
-      if (!response.ok) return
-      const nextLive = (await response.json()).live
-      if (!nextLive) return
-      const nextMode = modeOf(nextLive)
-      live = nextLive
-      if (nextMode !== mode) applyMode(nextMode, true)
-    } catch { /* Continúa con la última programación disponible. */ }
-  }
+  playButton.addEventListener('click', onPlayClick)
+  closeCaster?.addEventListener('click', onCloseCaster)
+  modal?.addEventListener('click', onModalClick)
+  audio.addEventListener('play', onAudioPlay)
+  audio.addEventListener('pause', onAudioPause)
+  audio.addEventListener('ended', onAudioEnded)
+  audio.addEventListener('error', onAudioError)
+  if (volume && volumeOutput) { audio.volume = Number(volume.value); volume.addEventListener('input', onVolume) }
 
   paint()
-  const polling = window.setInterval(refreshMode, 15000)
-  window.addEventListener('pagehide', () => { window.clearInterval(polling); stopFallback() }, { once: true })
+  if (openCasterOnStart && mode === 'caster') openCaster()
+
+  return () => {
+    playButton.removeEventListener('click', onPlayClick)
+    closeCaster?.removeEventListener('click', onCloseCaster)
+    modal?.removeEventListener('click', onModalClick)
+    audio.removeEventListener('play', onAudioPlay)
+    audio.removeEventListener('pause', onAudioPause)
+    audio.removeEventListener('ended', onAudioEnded)
+    audio.removeEventListener('error', onAudioError)
+    volume?.removeEventListener('input', onVolume)
+    stopFallback()
+  }
 }

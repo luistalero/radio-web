@@ -1,6 +1,8 @@
 import { upload } from 'https://esm.sh/@vercel/blob@2.6.1/client'
 
 const api = window.FRECUENCIA_API_URL || '/api'
+const localPreview = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:'
+const localContentKey = 'frecuencia-abierta:local-content'
 const request = (path, options = {}) => fetch(`${api}${path}`, { credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options })
 const loginView = document.querySelector('#login-view')
 const editorView = document.querySelector('#editor-view')
@@ -9,7 +11,7 @@ const loginStatus = document.querySelector('#login-status')
 const editorStatus = document.querySelector('#editor-status')
 let content = null
 
-const labels = { meta: 'Metadatos', branding: 'Marca', navigation: 'Navegación', hero: 'Portada', live: 'Señal en vivo', programs: 'Programas y horarios', territory: 'Nuestra tierra', stories: 'Historias', archive: 'Archivo sonoro', academic: 'Proyecto académico', participation: 'Participación', footer: 'Pie de página', items: 'Elementos', image: 'Imagen', src: 'Archivo o URL', alt: 'Texto alternativo', href: 'Enlace', body: 'Contenido', description: 'Descripción', subtitle: 'Título destacado', title: 'Título', kicker: 'Etiqueta de sección', label: 'Etiqueta', countLabel: 'Texto del contador', indexLabel: 'Etiqueta del índice', details: 'Datos', placeholders: 'Textos de ayuda', fields: 'Campos del formulario', schedule: 'Horarios', headers: 'Encabezados', actions: 'Botones', links: 'Enlaces', facts: 'Datos destacados', credits: 'Créditos', soundcloud: 'Audio de SoundCloud', url: 'URL pública de SoundCloud', mode: 'Modo al aire', fallback: 'Programación grabada', tracks: 'Audios de la playlist', artist: 'Autor o descripción' }
+const labels = { meta: 'Metadatos', branding: 'Marca', navigation: 'Navegación', hero: 'Portada', live: 'Señal en vivo', programs: 'Programas y horarios', territory: 'Nuestra tierra', stories: 'Historias', archive: 'Archivo sonoro', academic: 'Proyecto académico', participation: 'Participación', footer: 'Pie de página', items: 'Elementos', image: 'Imagen', src: 'Archivo o URL', alt: 'Texto alternativo', href: 'Enlace', body: 'Contenido', description: 'Descripción', subtitle: 'Título destacado', title: 'Título', kicker: 'Etiqueta de sección', label: 'Etiqueta', countLabel: 'Texto del contador', indexLabel: 'Etiqueta del índice', details: 'Datos', placeholders: 'Textos de ayuda', fields: 'Campos del formulario', schedule: 'Horarios', headers: 'Encabezados', actions: 'Botones', links: 'Enlaces', facts: 'Datos destacados', credits: 'Créditos', soundcloud: 'Audio de SoundCloud', url: 'URL pública de SoundCloud', mode: 'Modo al aire', fallback: 'Programación grabada', tracks: 'Audios de la playlist', artist: 'Autor o descripción', opening: 'Presentación inicial de Frecuencia Abierta', interlude: 'Presentación entre programas' }
 Object.assign(labels, { project: 'Dossier del proyecto', intro: 'Sobre el proyecto', objectives: 'Objetivos', justification: 'Justificación', audiences: 'Públicos', themes: 'Temáticas', style: 'Estilo de la emisora', general: 'Objetivo general', generalLabel: 'Etiqueta objetivo general', specificLabel: 'Etiqueta objetivos específicos', groups: 'Grupos de público' })
 const label = (key) => labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (letter) => letter.toUpperCase())
 const escape = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]))
@@ -19,7 +21,7 @@ const getAt = (path) => pathParts(path).reduce((target, part) => target?.[part],
 const setAt = (path, value) => { const parts = pathParts(path); const key = parts.pop(); const parent = parts.reduce((target, part) => target[part], content); parent[key] = value }
 const mediaType = (path, key) => {
   if (path === 'branding.logo' || key === 'src' && path.endsWith('.image.src')) return 'image'
-  if (key === 'src' && (path.endsWith('.audio.src') || path.includes('.fallback.tracks.'))) return 'audio'
+  if (key === 'src' && (path.endsWith('.audio.src') || path.includes('.fallback.'))) return 'audio'
   return null
 }
 
@@ -60,12 +62,23 @@ function changeArray(action, path, index) {
 }
 
 async function openEditor() {
-  const response = await request('/content')
-  if (!response.ok) throw new Error('No fue posible cargar el contenido.')
-  content = await response.json()
+  if (localPreview) {
+    try { content = JSON.parse(window.localStorage.getItem(localContentKey) || '') } catch { /* Se carga el contenido inicial abajo. */ }
+    if (!content) {
+      const response = await fetch('../data/content.json', { cache: 'no-store' })
+      if (!response.ok) throw new Error('No fue posible cargar el contenido inicial.')
+      content = await response.json()
+    }
+  } else {
+    const response = await request('/content')
+    if (!response.ok) throw new Error('No fue posible cargar el contenido.')
+    content = await response.json()
+  }
   content.live ||= {}
   content.live.mode ||= 'caster'
   content.live.fallback ||= { title: 'Programación grabada', description: 'Historias, voces y música de Frecuencia Abierta.', tracks: [] }
+  content.live.fallback.opening ||= { title: 'Presentación de Frecuencia Abierta', artist: 'Se reproduce antes de la programación', src: '' }
+  content.live.fallback.interlude ||= { title: 'Frecuencia Abierta', artist: 'Se reproduce entre programas', src: '' }
   content.live.fallback.tracks ||= []
   if (!content.live.fallback.tracks.length) content.live.fallback.tracks.push(
     { title: 'Canciones con historia', artist: 'Programa musical · Frecuencia Abierta', src: 'https://soundcloud.com/silvia-luna-140230178/silvia-luna-programa-musical?si=9ce3b2b9ae2e4c18989a66083bddbb54' },
@@ -84,6 +97,10 @@ document.querySelector('#login-form').addEventListener('submit', async (event) =
   event.preventDefault()
   loginStatus.textContent = 'Verificando acceso…'
   try {
+    if (localPreview) {
+      await openEditor()
+      return
+    }
     const response = await request('/login', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))) })
     const result = await response.json()
     if (!response.ok) throw new Error(result.error || 'No fue posible iniciar sesión.')
@@ -95,6 +112,11 @@ fields.addEventListener('input', (event) => { if (event.target.matches('[data-pa
 async function saveContent() {
   editorStatus.textContent = 'Guardando…'
   try {
+    if (localPreview) {
+      window.localStorage.setItem(localContentKey, JSON.stringify(content))
+      editorStatus.textContent = 'Cambios guardados solo en este navegador (modo local).'
+      return
+    }
     const response = await request('/content', { method: 'PUT', body: JSON.stringify(content) })
     const result = await response.json()
     if (!response.ok) throw new Error(result.error || 'No fue posible guardar.')
@@ -108,6 +130,7 @@ fields.addEventListener('change', async (event) => {
   const fileInput = event.target.closest('[data-upload-path]')
   const file = fileInput?.files?.[0]
   if (!file) return
+  if (localPreview) { editorStatus.textContent = 'En modo local coloca el archivo en assets/audio y pega una ruta como /assets/audio/mi-audio.mp3; las cargas a Blob solo funcionan en producción.'; fileInput.value = ''; return }
   const type = fileInput.dataset.mediaType
   const limit = type === 'audio' ? 50 : 10
   if (file.size > limit * 1024 * 1024) { editorStatus.textContent = `El ${type === 'audio' ? 'audio' : 'archivo'} supera el límite de ${limit} MB.`; fileInput.value = ''; return }
@@ -122,4 +145,5 @@ fields.addEventListener('change', async (event) => {
 })
 
 document.querySelector('#save').addEventListener('click', saveContent)
-document.querySelector('#logout').addEventListener('click', async () => { await request('/logout', { method: 'POST' }); editorView.hidden = true; loginView.hidden = false; loginStatus.textContent = '' })
+document.querySelector('#logout').addEventListener('click', async () => { if (!localPreview) await request('/logout', { method: 'POST' }); editorView.hidden = true; loginView.hidden = false; loginStatus.textContent = '' })
+if (localPreview) document.querySelectorAll('#login-form [required]').forEach((field) => field.removeAttribute('required'))
