@@ -46,6 +46,7 @@ export function initRadioPlayer(initialLive = {}, { openCasterOnStart = false } 
   let queueIndex = -1
   let phase = 'opening'
   let currentTrack = null
+  let currentRole = null
   let fallbackPlaying = false
   let soundCloudWidget = null
 
@@ -142,13 +143,29 @@ export function initRadioPlayer(initialLive = {}, { openCasterOnStart = false } 
       soundCloudWidget.play()
       hideStatus()
     } catch {
-      announce('No fue posible reproducir este audio de SoundCloud. Intentando el siguiente…')
-      window.setTimeout(() => void playNext(), 800)
+      handleTrackFailure()
     }
   }
 
-  async function playTrack(track) {
+  function handleTrackFailure() {
+    const presentation = currentRole === 'opening' || currentRole === 'interlude'
+    if (!presentation) {
+      announce('No fue posible reproducir este programa. Intentando el siguiente…')
+      void playNext()
+      return
+    }
+    soundCloudWidget?.pause()
+    soundCloudWidget = null
+    audio.pause()
+    audio.removeAttribute('src')
+    audio.load()
+    setPlaying(false)
+    announce(`No fue posible reproducir “${currentTrack?.title || 'la presentación'}”. Revisa el archivo o la URL de esta presentación en el administrador.`)
+  }
+
+  async function playTrack(track, role) {
     currentTrack = track
+    currentRole = role
     paint()
     if (isSoundCloudUrl(track.src)) return playSoundCloud(track)
     soundCloudWidget?.pause()
@@ -166,11 +183,11 @@ export function initRadioPlayer(initialLive = {}, { openCasterOnStart = false } 
     if (!tracks().length) return announce('Aún no hay audios en la programación grabada. Agrégalos desde el administrador.')
     if (phase === 'opening') {
       phase = 'program'
-      if (validTrack(live.fallback?.opening)) return playTrack(live.fallback.opening)
+      if (validTrack(live.fallback?.opening)) return playTrack(live.fallback.opening, 'opening')
     }
     if (phase === 'interlude') {
       phase = 'program'
-      if (validTrack(live.fallback?.interlude)) return playTrack(live.fallback.interlude)
+      if (validTrack(live.fallback?.interlude)) return playTrack(live.fallback.interlude, 'interlude')
     }
     if (!queue.length || queueIndex >= queue.length - 1) {
       queue = shuffle(tracks())
@@ -178,7 +195,7 @@ export function initRadioPlayer(initialLive = {}, { openCasterOnStart = false } 
     }
     queueIndex += 1
     phase = 'interlude'
-    return playTrack(queue[queueIndex])
+    return playTrack(queue[queueIndex], 'program')
   }
 
   async function toggleFallback() {
@@ -210,7 +227,7 @@ export function initRadioPlayer(initialLive = {}, { openCasterOnStart = false } 
   const onAudioPlay = () => setPlaying(true)
   const onAudioPause = () => setPlaying(false)
   const onAudioEnded = () => void playNext()
-  const onAudioError = () => { if (audio.src) { announce('No fue posible reproducir este audio. Intentando el siguiente…'); void playNext() } }
+  const onAudioError = () => { if (audio.src) handleTrackFailure() }
   const onVolume = () => {
     audio.volume = Number(volume.value)
     soundCloudWidget?.setVolume(Math.round(audio.volume * 100))
