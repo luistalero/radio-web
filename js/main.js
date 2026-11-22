@@ -2,7 +2,7 @@ import { initNavigation } from './navigation.js'
 import { initPrograms } from './programs.js'
 import { loadContent, renderSite } from './content.js'
 import { initParticipation } from './participation.js'
-import { initAudioPlayer, initCasterPlayer } from './audio-player.js'
+import { initRadioPlayer } from './audio-player.js'
 import { initAnimations } from './animations.js'
 import { initThreeScene } from './three-scene.js'
 
@@ -14,8 +14,7 @@ loadContent().then((content) => {
   root?.removeAttribute('aria-busy')
   initNavigation()
   initParticipation()
-  if (content.live?.caster?.publicToken) initCasterPlayer(content.live.caster)
-  else initAudioPlayer(content.live?.streamUrl)
+  initRadioPlayer(content.live)
   initThreeScene()
   initPrograms()
   initAnimations()
